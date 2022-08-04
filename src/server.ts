@@ -29,6 +29,27 @@ import {filterImageFromURL, deleteLocalFiles} from './util/util';
 
   /**************************************************************************** */
 
+  app.get("/filteredimage", async (req, res) => {
+    // 1. validate the image_url query
+    var image_url = req.query.image_url
+    console.log(image_url);
+    if (image_url == null) {
+      res.status(400).send('No image_url provided');
+    } else {
+      // 2. call filterImageFromURL(image_url) to filter the image
+      try {
+        let filtered_image_path = await filterImageFromURL(image_url);
+        console.log(filtered_image_path);
+        res.status(200).sendFile(filtered_image_path, () => {
+          deleteLocalFiles([filtered_image_path]);
+        })
+      } catch (err) {
+        console.log(err);
+        res.status(500).send("Failed to process image");
+      }
+    }
+  })
+
   //! END @TODO1
   
   // Root Endpoint
